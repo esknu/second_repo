@@ -1,0 +1,71 @@
+---
+title: "nycproj"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document.
+To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code.
+You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+```{r}
+#| label: setup
+#| echo: false
+#| output: false
+#| message: false
+library(tidyverse)
+library(nycflights13)
+
+```
+
+```{r}
+set.seed(1234)
+res_mean_rnorm_3dig <- paste("Result:",
+                             round(
+                               mean(
+                                 rnorm(n = 10,
+                                       mean = 0, sd = 1)), 
+                               digits = 3), sep = "")
+res_mean_rnorm_3dig
+```
+
+```{r}
+set.seed(1234)
+res_rnorm <- rnorm(n = 10, mean = 0, sd = 1)
+res_mean_rnorm <- mean(res_rnorm)
+res_mean_rnorm_3dig <- round(res_mean_rnorm, digits = 3)
+res_mean_rnorm_3dig_string <- paste("Result:", res_mean_rnorm_3dig, sep = "")
+# print result
+res_mean_rnorm_3dig_string
+```
+
+```{r}
+#| Using pipes
+set.seed(1234)
+res_mean_rnorm_3dig_string <- 
+  rnorm(n = 10, mean = 0, sd = 1) %>%
+  mean() %>%
+  round(digits = 3) %>% 
+  # The dot '.' is to show where the content of the pipe should be put
+  paste("Result:", .)
+res_mean_rnorm_3dig_string
+```

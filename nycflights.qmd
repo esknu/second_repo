@@ -1,0 +1,188 @@
+---
+title: "nycflight"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: setup
+library(tidyverse)
+library(nycflights13)
+```
+
+```{r}
+flights <- flights
+```
+
+```{r}
+dim(flights)[1]
+class(flights)
+
+```
+
+```{r}
+#| paged.print: false
+flights |> 
+  arrange(desc(month), desc(day))
+```
+
+```{r}
+#| paged.print: false
+flights <- flights |>
+  arrange(month, day,sched_dep_time)
+
+
+```
+
+```{r}
+#| paged.print: false
+flights |>
+  filter(month == 1, day == 1) |>
+  print(
+    n = 5,
+    width = 70
+  )
+```
+
+```{r}
+summary(flights)
+```
+
+```{r}
+print(
+  filter(flights, month == 1, day %in% c(1, 15, 30)),
+  n = 5,
+  width = 70,
+)
+```
+
+```{r}
+flights |>
+  filter(month %in% c(4,9)) |>
+  nrow()
+```
+
+```{r}
+#| paged.print: false
+flights |>
+  group_by(month) |>
+  summarise(antall.flyvninger = n())
+
+```
+
+```{r}
+#| paged.print: false
+flights |>
+  filter(month == 1) |>
+  group_by(day) |>
+  summarise(flyvninger_per_dag = n())
+```
+
+```{r}
+#| paged.print: false
+flights |>
+  filter(month == 1) |>
+  group_by(day) |>
+  count() |>
+  arrange(desc(n)) |>
+  print(n = 31)
+  
+
+
+```
+
+```{r}
+flights |>
+  filter(day %in% c(1,2)) |>
+  nrow()
+```
+
+```{r}
+flights |>
+  filter(arr_delay >= 15 & arr_delay < 30) |>
+  select(arr_delay) |>
+  nrow()
+```
+
+```{r}
+sum(is.na(flights$arr_delay))
+
+  
+```
+
+```{r}
+flights <- flights
+```
+
+```{r}
+flights <- flights |>
+  select(-year)
+```
+
+```{r}
+flights <- flights |>
+  select(-year) |>
+  select(
+    month:day, 
+    flyselskap = carrier, 
+    halenummer = tailnum,
+    everything()
+    )
+
+```
+
+```{r}
+# reload dataset
+flights <- nycflights13::flights
+```
+
+```{r}
+arr_delay_May <- flights |>
+  select(
+    day, month, arr_delay
+  ) |>
+  filter(month == 5) |>
+  select(-month)
+```
+
+```{r}
+#| paged.print:false
+arr_delay_May |>
+  group_by(day) |>
+  summarise(
+    mean_delay = round(
+      mean(
+      arr_delay,
+    na.rm = TRUE
+      ),
+    digits = 2
+    ),
+    median_delay = median(arr_delay, na.rm = TRUE),
+    min_delay = min(arr_delay, na.rm = TRUE),
+    max_delay = max(arr_delay, na.rm = TRUE),
+    total_delay = sum(arr_delay, na.rm = TRUE)
+    ) |>
+  print(n = 31)
+```
+
+```{r}
+my_new_data <- flights %>%
+  select(month:day, ends_with("delay"), distance, air_time) %>%
+  mutate(
+    gain = dep_delay - arr_delay,
+    speed = (distance/air_time) * 60
+    ) %>%
+  select(month:day, gain, everything()) %>%
+  arrange(gain)
+head(my_new_data, n = 5) 
+```
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document.
+To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code.
+You can embed code like thi
