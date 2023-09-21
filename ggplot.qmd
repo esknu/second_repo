@@ -362,3 +362,55 @@ X10540_20230908_113214 <- read_delim(
   show_col_types = FALSE,
   )
 ```
+
+```{r}
+metadata_10540 <- ApiData(
+  "http://data.ssb.no/api/v0/en/table/10540",
+  returnMetaFrames = TRUE
+  )
+```
+
+```{r}
+library(PxWebApiData)
+metadata_13891 <- ApiData(
+  "https://data.ssb.no/api/v0/no/table/13891/",
+  returnMetaFrames = TRUE
+  )
+```
+
+```{r}
+#Get more info about table
+ApiData(
+"http://data.ssb.no/api/v0/en/table/10540",
+returnApiQuery = TRUE
+) 
+```
+
+```{r}
+unemp99to02 <- ApiData12(
+  "http://data.ssb.no/api/v0/en/table/10540",
+  # Have not been able to specify more complex regions
+  Region = list("11*"),
+  Tid = c(paste(
+    rep(1999:2002, each = 12), 
+    "M",
+    sprintf("%02d", 1:12), 
+    sep = "")
+    )
+  )
+
+```
+
+```{r}
+metadata_10540$Tid
+```
+
+```{r}
+paste(
+  rep(1999:2002, each = 12),
+  "M",
+  sprintf("%02d", 1:12),
+  sep = ""
+)
+
+```
