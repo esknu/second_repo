@@ -1,0 +1,242 @@
+---
+title: "EDA"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: setup
+#| output: false
+#| message: false
+#| echo: false
+packs <- suppressPackageStartupMessages(
+  c(
+    library(tidyverse),
+    library(nycflights13),
+    library(gridExtra),
+    library(modelr),
+    library(grid),
+    library(ggplotify),
+    library(vtable),
+    library(tidyr)
+    )
+)
+
+```
+
+```{r}
+my_heights <- modelr::heights
+```
+
+```{r}
+my_heights |>
+  select(income, height) |> 
+  filter(income < 300000) |> 
+  ggplot(mapping = aes(x = height, y = income)) + 
+  geom_point() +
+  geom_smooth(
+    method = lm,
+  )
+```
+
+```{r}
+summary(heights)
+```
+
+```{r}
+# NAs in my_heights?
+my_heights %>% 
+  apply(MARGIN = 2, FUN = is.na) %>% 
+  apply(MARGIN = 2, FUN = sum) 
+```
+
+```{r}
+heights %>%
+  is.na() %>%
+  colSums() %>%
+  .[.> 0]
+```
+
+```{r}
+heights %>%
+  summary()
+```
+
+```{r}
+heights %>%
+  mutate(married = if_else(
+    marital == "married",
+    TRUE,
+    FALSE
+  ) 
+  ) %>%
+    filter(sex == "male") %>%
+    select(-sex, - marital) %>%
+    vtable::st(group = "married")
+  
+```
+
+```{r}
+ggplot(data = my_heights) +
+  geom_bar(mapping = aes(x = education), na.rm = TRUE)
+```
+
+```{r}
+hist1 <- ggplotify::as.ggplot(~hist(my_heights$income, breaks = 20))
+hist2 <- ggplot(my_heights, mapping = aes(x = income)) +
+  geom_histogram(bins = 20)
+
+gridExtra::grid.arrange(hist1, hist2, ncol = 2)
+
+```
+
+```{r}
+hist3 <- ggplot(my_heights, mapping = aes(x = income)) +
+  geom_histogram(bins = 40, na.rm = TRUE)
+hist4 <- ggplot(my_heights, mapping = aes(x = height)) +
+  geom_histogram(bins = 40, na.rm = TRUE)
+hist5 <- ggplot(my_heights, mapping = aes(x = weight)) +
+  geom_histogram(bins = 40, na.rm = TRUE)
+gridExtra::grid.arrange(hist3, hist4, hist5, nrow = 1)
+```
+
+```{r}
+heights %>% 
+  mutate(
+    edu_fac = cut(education, 
+                  breaks = c(0, 12, 14, 16, 21), 
+                  labels = c("NotHS", "NotTC", "NotC", "C+"),
+                  right = FALSE) 
+  ) %>% 
+  filter(!is.na(edu_fac) & income > 0) %>%
+  ggplot(mapping = aes(x = income, fill = edu_fac, colour = edu_fac)) +
+  geom_density(alpha = 0.2, na.rm = TRUE) + 
+  facet_wrap(~edu_fac)
+```
+
+```{r}
+my_heights %>% 
+  mutate(
+    edu_fac = cut(education, 
+                  breaks = c(0, 12, 14, 16, 21), 
+                  labels = c("NotHS", "NotTC", "NotC", "C+"),
+                  right = FALSE) 
+  ) %>% 
+  filter(income > 0) %>% 
+  ggplot(mapping = aes(x = edu_fac, y = income)) +
+  facet_wrap(~sex) + 
+  geom_boxplot() + 
+  coord_flip()
+```
+
+```{r}
+my_heights %>% 
+  mutate(
+    edu_fac = cut(education, 
+                  breaks = c(0, 12, 14, 16, 21), 
+                  labels = c("NotHS", "NotTC", "NotC", "C+"),
+                  right = FALSE) 
+  ) %>% 
+  filter(income > 0 & !is.na(weight) & !is.na(afqt) & !is.na(edu_fac)) %>%
+ggplot(mapping = aes(x = income, y = after_stat(density))) +
+  geom_freqpoly(mapping = aes(colour = edu_fac), binwidth = 10000)
+```
+
+```{r}
+my_heights %>% 
+  mutate(
+    edu_fac = cut(education, 
+                  breaks = c(0, 12, 14, 16, 21), 
+                  labels = c("NotHS", "NotTC", "NotC", "C+"),
+                  right = FALSE) 
+  ) %>% 
+  filter(income > 0 & !is.na(weight) & !is.na(afqt) & !is.na(edu_fac)) %>%
+  ggplot() +
+  geom_count(mapping = aes(x = marital, y = edu_fac))
+```
+
+```{r}
+my_heights %>% 
+  filter(income > 0 & !is.na(weight) & !is.na(afqt) & !is.na(education)) %>%
+  ggplot() +
+  geom_point(mapping = aes(x = education, y = income), alpha = 0.05)
+```
+
+```{r}
+diamonds %>% 
+  ggplot(mapping = aes(x = carat, y = price)) +
+  geom_point(size = 0.1)
+```
+
+```{r}
+diamonds |> 
+  filter(carat >= 2.5) |> 
+  nrow()
+  
+```
+
+```{r}
+#| echo: false
+# siste
+
+```
+
+Tidy data
+
+```{r}
+table3
+```
+
+```{r}
+tidy3 <- table3 |> 
+  separate(
+    col = rate,
+    into = c("cases", "pop"),
+    sep = "/"
+  )
+```
+
+```{r}
+tidy2 <- table2 |> 
+  pivot_wider(
+    names_from = type,
+    values_from = count,
+    
+  )
+tidy2
+```
+
+tidy2 \<- table2
+
+```{r}
+table2
+```
+
+```{r}
+tidy4a <- table4a |> 
+  pivot_longer(
+    cols = c("1999", "2000"),
+    names_to = "Year",
+    values_to = "cases"
+  )
+```
+
+```{r}
+tidy4a
+table4a
+
+```
+
+```{r}
+tidy4b <- table4b |> 
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "pop",
+    names_prefix = "y"
+  )
+```
+
+```{r}
+tidy4b
+```
